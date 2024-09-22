@@ -1,4 +1,5 @@
 public class CalculosTemperatura {
+    // Essa classe é responsável por realizar os cálculos das temperaturas
     private double somaTemperaturas;
     private double temperaturaMaxima;
     private double temperaturaMinima;

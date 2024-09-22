@@ -9,7 +9,7 @@ public class Cidade {
         this.dadosTemperatura = dadosTemperatura;
     }
 
-    public Map<Integer, CalculosTemperatura> calculaTemperaturasMensais() {
+    public Map<Integer, CalculosTemperatura> calcularTemperaturasMensais() {
         Map<Integer, CalculosTemperatura> resultadoMensal = new HashMap<>();
 
         for (TemperaturaDiaria temp : dadosTemperatura) {
