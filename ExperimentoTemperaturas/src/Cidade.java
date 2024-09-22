@@ -22,4 +22,12 @@ public class Cidade {
 
         return resultadoMensal;
     }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public List<TemperaturaDiaria> getDadosTemperatura() {
+        return dadosTemperatura;
+    }
 }
