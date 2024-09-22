@@ -1,6 +1,8 @@
 import java.io.*;
 import java.nio.file.*;
 import java.util.*;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class LeitorCSV {
 
@@ -8,55 +10,137 @@ public class LeitorCSV {
     // Chama a função lerDadosCidade e armazena em uma lista
     // Armazena os dados de cada cidade em um Map (a chave é o nome da cidade).
     // Ao final, transforma esse mapa em uma lista de objetos Cidade.
-    public static List<Cidade> carregarDadosCidades(String diretorioPath) {
-        List<Cidade> cidades = new ArrayList<>();
-        Map<String, List<TemperaturaDiaria>> dadosCidades = new HashMap<>();
+
+    public static ArrayList<Path> carregarPaths(String diretorioPath) {
+        ArrayList<Path> arr = new ArrayList<>();
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(Paths.get(diretorioPath), "*.csv")) {
+
+
+
+            for (Path filePath : stream) {
+                arr.add(filePath);
+            }
+
+
+        } catch (Exception e) {
+            System.err.println("Erro ao processar os arquivos CSV: " + e.getMessage());
+        }
+
+        return arr;
+    }
+
+
+    public static List<CidadeDataPiece> carregarDadosCidades(String diretorioPath, int numThreads) {
+        long inicio = System.currentTimeMillis();
+        List<CidadeDataPiece> cidadeDataPieces = new ArrayList<>();
+        Map<String, CidadeData> dadosCidades = new ConcurrentHashMap<>(); // Map thread-safe
+        ExecutorService executor = Executors.newFixedThreadPool(numThreads); // Pool de threads
+        List<Future<Void>> futures = new ArrayList<>(); // Lista para acompanhar as tarefas
+    List<Thread> threads  = new ArrayList<>();
+        AtomicInteger count = new AtomicInteger();
+
 
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(Paths.get(diretorioPath), "*.csv")) {
-            for (Path filePath : stream) {
-                // Lê o nome da cidade a partir do nome do arquivo
-                String nomeCidade = filePath.getFileName().toString().replace(".csv", "");
 
-                List<TemperaturaDiaria> temperaturas = lerDadosCidade(filePath);
-                dadosCidades.put(nomeCidade, temperaturas);
+            List<Path> paths = new ArrayList<>();
+            stream.forEach(paths::add);
+            int parte = paths.size() / numThreads;
+            for (int i = 0; i < numThreads; i++) {
+                int inicioT = i * parte;
+                int fimT = Math.min(inicioT + parte, paths.size());
+                    Thread thread = new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            for (int j = inicioT; j < fimT; j++) {
+                                Path path = paths.get(j);
+                                String nomeCidade = path.getFileName().toString().replace(".csv", "");
+                                CidadeData cidadeDataPiece = lerDadosCidade(path, 1);
+                            }
+                        }
+                    });
+
+                    threads.add(thread);
+                    thread.start();
+                }
+            // Aguarda a conclusão de todas as tarefas
+            for (Thread thread : threads) {
+                thread.join(); // Garante que cada tarefa foi concluída
             }
-        } catch (IOException e) {
-            System.err.println("Erro ao ler os arquivos CSV: " + e.getMessage());
+
+
+        } catch (Exception e) {
+            System.err.println("Erro ao processar os arquivos CSV: " + e.getMessage());
+        } finally {
+            executor.shutdown(); // Finaliza o pool de threads
         }
 
-        // Transforma o mapa de cidades e seus dados em objetos Cidade
-        for (Map.Entry<String, List<TemperaturaDiaria>> entry : dadosCidades.entrySet()) {
-            Cidade cidade = new Cidade(entry.getKey(), entry.getValue());
-            cidades.add(cidade);
-        }
-
-        return cidades;
+        long fim = System.currentTimeMillis();
+        long tempoTotal = fim - inicio; // Calcula a diferença entre o início e o fim
+        // Exibe o tempo gasto
+        System.out.println("Tempo total para processar os arquivos: " + tempoTotal + " ms");
+        System.out.println("Número de Threads: " + numThreads);
+        return cidadeDataPieces;
     }
 
     // Essa função lê os arquivos CSV e adiciona em uma lista de TemperaturaDiaria
-    private static List<TemperaturaDiaria> lerDadosCidade(Path filePath) {
-        List<TemperaturaDiaria> temperaturas = new ArrayList<>();
+    static CidadeData lerDadosCidade(Path filePath, int numThreads) {
 
-        try (BufferedReader br = Files.newBufferedReader(filePath)) {
-            String linha;
-            br.readLine(); // Ignora o cabeçalho
+        ArrayList<Thread> threads = new ArrayList<>();
+        CidadeData data = new CidadeData();
+        try {
+            List<String> lines = Files.readAllLines(filePath);
+            lines.remove(0);
 
-            while ((linha = br.readLine()) != null) {
-                String[] valores = linha.split(",");
-                String pais = valores[0];
-                String cidade = valores[1];
-                int mes = Integer.parseInt(valores[2]);
-                int dia = Integer.parseInt(valores[3]);
-                int ano = Integer.parseInt(valores[4]);
-                double temperatura = Double.parseDouble(valores[5]);
+            int lineCount = lines.size();
 
-                TemperaturaDiaria temp = new TemperaturaDiaria(pais, cidade, mes, dia, ano, temperatura);
-                temperaturas.add(temp);
+            int parte = numThreads / lineCount;
+
+            for (int i = 0; i < numThreads; i++) {
+                int inicioT = i * parte;
+                int finalT = Math.min(lineCount, inicioT + parte);
+
+                Thread thread = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        for (int j = inicioT; j < finalT; j++) {
+                            String linha = lines.get(j);
+                            String[] valores = linha.split(",");
+                            String pais = valores[0];
+                            String nome = valores[1];
+                            int mes = Integer.parseInt(valores[2]);
+                            int dia = Integer.parseInt(valores[3]);
+                            int ano = Integer.parseInt(valores[4]);
+                            double temperatura = Double.parseDouble(valores[5]);
+
+                            CidadeDataPiece cidadeDataPiece = new CidadeDataPiece(nome, pais, dia, mes, ano, temperatura);
+
+                            synchronized (data) {
+                                data.dataPieces.add(cidadeDataPiece);
+                            }
+                        }
+                    }
+                });
+
+                threads.add(thread);
+                thread.start();
+
             }
+
+            for (Thread thread: threads) {
+                thread.join();
+            }
+            TemperatureData[] temperatureDataPerMonth = data.temperaturePerMonth();
+
+
+
+            return data;
+
         } catch (IOException e) {
-            System.err.println("Erro ao ler o arquivo: " + e.getMessage());
+            throw new RuntimeException(e);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         }
 
-        return temperaturas;
     }
 }
