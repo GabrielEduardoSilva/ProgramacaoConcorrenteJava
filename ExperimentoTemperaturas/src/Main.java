@@ -3,7 +3,7 @@ import java.util.*;
 
 public class Main {
     public static void main(String[] args) throws Exception {
-        String diretorioPath = "ExperimentoTemperaturas/src/temperaturas_cidades";
+        String diretorioPath = "src/temperaturas_cidades";
         // Carregar dados das cidades
 
         List<Path> paths = LeitorCSV.carregarPaths(diretorioPath);
