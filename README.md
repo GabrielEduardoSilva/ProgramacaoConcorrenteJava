@@ -12,6 +12,13 @@ O experimento consiste em um projeto em Java que lê 320 arquivos 320 contendo t
 
 O objetivo do experimento é computar o tempo de execução de cada rodada e, ao fim das 10 rodadas, calcular o tempo médio para execução(soma dos tempos de cada rodada dividido por 10).
 
+No gráfico abaixo estão os resultados do experimento:
+
+![image](https://github.com/user-attachments/assets/abb34658-2e7d-4b49-8e2d-3917896480cc)
+
+O gráfico demonstra que o uso de threads melhora a eficiência do algoritmo. Porém, o uso excessivo de threads causa uma sobrecarga no gerenciamento dessas tarefas que resulta em uma lentidão e aumento do tempo necessário para a sua execução. Ou seja, usar muitas threads para tarefas simples não tem um bom custo-benefício, já que o sistema passa mais tempo gerenciando as threads do que executando a tarefa em si. Esse gerenciamento inclui alocar recursos para cada thread, sincronizar as threads para evitar que elas tentem acessar o mesmo recurso simultaneamente, e a troca de contexto entre threads, que envolve interromper uma thread para permitir que outra tenha acesso à CPU.
+
+
 ## Configurações
 
 Experimento realizado no IntelliJ IDEA 2024.1.1 (Ultimate Edition)
