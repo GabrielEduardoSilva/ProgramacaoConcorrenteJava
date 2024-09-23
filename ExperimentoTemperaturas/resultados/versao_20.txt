@@ -1,0 +1,22 @@
+Experimento 20
+Rodada 1
+Tempo: 1383ms
+Rodada 2
+Tempo: 1075ms
+Rodada 3
+Tempo: 955ms
+Rodada 4
+Tempo: 1296ms
+Rodada 5
+Tempo: 965ms
+Rodada 6
+Tempo: 1031ms
+Rodada 7
+Tempo: 900ms
+Rodada 8
+Tempo: 1094ms
+Rodada 9
+Tempo: 1123ms
+Rodada 10
+Tempo: 1200ms
+Tempo médio: 1102ms
