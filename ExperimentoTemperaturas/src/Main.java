@@ -15,7 +15,7 @@ public class Main {
         // Experiment 1
         BenchmarkResult benchmarkResult1 = Benchmarker.benchmark(() -> {
             ArrayList<Thread> threads = new ArrayList<>();
-
+            
             for (Path path: paths) {
                 String nomeCidade = path.getFileName().toString().replace(".csv", "");
                 CidadeData cidades = LeitorCSV.lerDadosCidade(path, 1);

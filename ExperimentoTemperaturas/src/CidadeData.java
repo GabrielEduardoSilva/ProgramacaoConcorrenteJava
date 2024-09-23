@@ -1,11 +1,15 @@
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class CidadeData {
 
     ArrayList<Integer> months = new ArrayList<>();
     int monthCount = 0;
-    public ArrayList<CidadeDataPiece> dataPieces = new ArrayList<>();
-
+    public List<CidadeDataPiece> dataPieces = new ArrayList<>();
+    
+  
+    
     public void addData(CidadeDataPiece piece) {
         dataPieces.add(piece);
     }
@@ -45,6 +49,22 @@ public class CidadeData {
 
         return temperatures;
     }
+    
+    public void print() {
+    	System.out.println("Cidade: " + dataPieces.get(0).getCountry() + "-" + dataPieces.get(0).getCity());
+    	System.out.println("Mes | Temp Min | Temp Max | Temp Media");
+    	
+    	TemperatureData[] temperaturas = temperaturePerMonth();
+    	
+    	int index = 0;
+    	for (TemperatureData temp: temperaturas) {
+    		String result = "";
+    		
+    		
+    		System.out.format("%d | %f | %f | %f\n", index + 1, temp.min, temp.max, temp.mean);
+    		index++;
+    	}
+    }
 
     public int countMonths() {
 
@@ -60,6 +80,5 @@ public class CidadeData {
 
     }
 
-    public CidadeData() {}
 
 }

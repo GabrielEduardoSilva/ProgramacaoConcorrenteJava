@@ -86,6 +86,7 @@ public class LeitorCSV {
     static CidadeData lerDadosCidade(Path filePath, int numThreads) {
 
         ArrayList<Thread> threads = new ArrayList<>();
+        List<CidadeDataPiece> pieces = Collections.synchronizedList(new ArrayList<>());
         CidadeData data = new CidadeData();
         try {
             List<String> lines = Files.readAllLines(filePath);
@@ -93,8 +94,8 @@ public class LeitorCSV {
 
             int lineCount = lines.size();
 
-            int parte = numThreads / lineCount;
-
+            int parte = lineCount / numThreads;
+ 
             for (int i = 0; i < numThreads; i++) {
                 int inicioT = i * parte;
                 int finalT = Math.min(lineCount, inicioT + parte);
@@ -102,8 +103,9 @@ public class LeitorCSV {
                 Thread thread = new Thread(new Runnable() {
                     @Override
                     public void run() {
-
+                    	
                         for (int j = inicioT; j < finalT; j++) {
+                        	
                             String linha = lines.get(j);
                             String[] valores = linha.split(",");
                             String pais = valores[0];
@@ -114,9 +116,10 @@ public class LeitorCSV {
                             double temperatura = Double.parseDouble(valores[5]);
 
                             CidadeDataPiece cidadeDataPiece = new CidadeDataPiece(nome, pais, dia, mes, ano, temperatura);
-
+                        	
+                        	
                             synchronized (data) {
-                                data.dataPieces.add(cidadeDataPiece);
+                            	data.dataPieces.add(cidadeDataPiece);
                             }
                         }
                     }
@@ -130,9 +133,12 @@ public class LeitorCSV {
             for (Thread thread: threads) {
                 thread.join();
             }
-            TemperatureData[] temperatureDataPerMonth = data.temperaturePerMonth();
+            
+            
+            //System.out.println(pieces.size());
+           data.print();
 
-
+            
 
             return data;
 
