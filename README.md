@@ -27,6 +27,11 @@ Configurações do projeto:
 
 <img width="698" alt="image" src="https://github.com/user-attachments/assets/7e4e14ee-9b16-490e-91b4-fd18dd5493bc">
 
+Configurações do sistema operacional:
+
+<img width="292" alt="image" src="https://github.com/user-attachments/assets/933dc0be-d8d9-40db-a4cf-86a3645ab11f">
+
+
 ## Arquivo PDF do relatório
 
 [Relatório Prática Coletiva.pdf](https://github.com/user-attachments/files/17098161/Relatorio.Pratica.Coletiva.pdf)
