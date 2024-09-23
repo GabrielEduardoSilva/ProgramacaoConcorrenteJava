@@ -26,3 +26,8 @@ Experimento realizado no IntelliJ IDEA 2024.1.1 (Ultimate Edition)
 Configurações do projeto:
 
 <img width="698" alt="image" src="https://github.com/user-attachments/assets/7e4e14ee-9b16-490e-91b4-fd18dd5493bc">
+
+## Arquivo PDF do relatório
+
+[Relatório Prática Coletiva.pdf](https://github.com/user-attachments/files/17098161/Relatorio.Pratica.Coletiva.pdf)
+
